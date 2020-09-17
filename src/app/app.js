@@ -33,15 +33,18 @@ const svg = select('svg')
 const g = svg.append('g')
   .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
-// Create a treemap layout
+// Function that takes data and returns root node
 const treemapLayout = data => treemap()
     .size([innerWidth, innerHeight])
     .padding(1)
     .round(true)
   (hierarchy(data)
+    // Compute id for each data item
+    .eachBefore(d => d.data.id = (d.parent ? d.parent.data.id + '.' : '') + d.data.name)
     .sum(d => d.value)
     .sort((a, b) => b.value - a.value))
 
+// Color scale
 const color = d3.scaleOrdinal(d3.schemeCategory10)
 
 // Fetch data
@@ -55,20 +58,36 @@ Promise.all([
   videoGamesData
 ]) => {
   
+  // Root node
   const root = treemapLayout(kickstarterData);
 
-  const leaf = g.selectAll("g")
+  // Cell group element
+  const cell = g.selectAll('g')
     .data(root.leaves())
-    .join("g")
-      .attr("transform", d => `translate(${d.x0},${d.y0})`);
+    .join('g')
+      .attr('transform', d => `translate(${d.x0},${d.y0})`);
 
-  leaf.append("rect")
-  .attr("fill", d => { while (d.depth > 1) d = d.parent; return color(d.data.name); })
-  .attr("fill-opacity", 0.6)
-  .attr("width", d => d.x1 - d.x0)
-  .attr("height", d => d.y1 - d.y0);
+  // Append rectangle to cell
+  cell.append('rect')
+    .attr('fill', d => { while (d.depth > 1) d = d.parent; return color(d.data.name); })
+    .attr('fill-opacity', 0.6)
+    .attr('width', d => d.x1 - d.x0)
+    .attr('height', d => d.y1 - d.y0);
 
-
+  // Clip overlapping 
+  cell.append('clipPath')
+      .attr('id', d => 'clip-' + d.data.id)
+    .append('use')
+      .attr('xlink:href', d => '#' + d.data.id);
+  
+  cell.append("text")
+    .attr("clip-path", d => "url(#clip-" + d.data.id + ")")
+  .selectAll("tspan")
+    .data(function(d) { return d.data.name.split(/(?=[A-Z][^A-Z])/g); })
+  .enter().append("tspan")
+    .attr("x", 4)
+    .attr("y", function(d, i) { return 13 + i * 10; })
+  console.log(kickstarterData);
 
 
 
