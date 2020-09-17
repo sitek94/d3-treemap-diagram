@@ -1,7 +1,7 @@
 {
-  "name": "d3-template",
+  "name": "d3-treemap-diagram",
   "version": "1.0.0",
-  "description": "Basic template that uses webpack to bundle html, scss and js",
+  "description": "Treemap diagram that shows the data about video game sales",
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server --config webpack.dev.js --open",
