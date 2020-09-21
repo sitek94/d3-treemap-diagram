@@ -25,9 +25,15 @@ body {
 
 svg {
   display: block;
-  margin: 10px auto;
+  
+  &.treemap {
+    margin: 10px auto;
+    font-size: 10px;
+  }
 
-  font: 10px sans-serif;
+  &.legend {
+    margin: 0 auto;
+  }
 }
 
 /* CELL */
@@ -67,30 +73,8 @@ svg {
 
 /* LEGEND */
 .legend {
-  margin: 0 auto 20px;
-  width: 75%;
-
-  display: grid;
-  justify-content: center;
-  grid-template-columns: repeat(3, 200px);
-  gap: 10px;
-
-  @media (max-width: 800px) {
-    width: 100%;
-    grid-template-columns: repeat(2, 200px);
-  }
-
-  &__item {
-    display: flex;
-    align-items: center;
-
-    &__swatch {
-      opacity: .9;
-    }
-
-    &__text {
-      margin-left: 10px;
-    }
+  &-text {
+    fill: var(--gray-40);
   }
 }
 

@@ -4,27 +4,56 @@ export const colorLegend = (selection, props) => {
     swatchSize,
     swatchWidth = swatchSize,
     swatchHeight = swatchSize,
+    width = 600,
+    height = 500,
+    columns = 3,
+    ySpacing = 50,
   } = props;
 
-  const groups = selection.selectAll('div')
+  // Compute horizontal spacing
+  const xSpacing = width / columns;
+
+  // Legend svg
+  const svg = selection.append("svg")
+    .attr('id', 'legend')
+    .attr('class', 'legend')
+    .attr("width", width)
+    .attr("height", height);
+  
+  // Legend group container
+  const g = svg.append('g')
+    .attr('transform', 'translate(50, 0)');
+
+  // Legend item groups
+  const groups = g.selectAll('g')
     .data(colorScale.domain());
-  const groupsEnter = groups.enter().append('div');
+  const groupsEnter = groups.enter().append('g')
+    .append('g')
+        .attr('class', '');
   groupsEnter
     .merge(groups)
-    .attr('class', 'legend__item')
-  groups.exit().remove();
-
-  groupsEnter
-    .append('div')
-    .attr('class', 'legend__item__swatch')
-		.merge(groups.select('div'))
-      .style('background-color', colorScale)
-      .style('width', swatchWidth + 'px')
-  		.style('height', swatchHeight + 'px');
+    	.attr('transform', (d, i) => 
+            `translate(${i % columns * xSpacing}, ${Math.floor(i / columns) * ySpacing})`)
+  	groups.exit().remove();
   
-   groupsEnter
-    .append('span')
-    .attr('class', 'legend__item__text')
-		.merge(groups.select('span'))
-      .text(d => d)
+  // Append rects
+  groupsEnter
+    .append('rect')
+    .attr('class', 'legend-item')
+		.merge(groups.select('rect'))
+      .attr('fill', colorScale)
+      .attr('fill-opacity', 0.7)
+      .attr('width', swatchWidth)
+  		.attr('height', swatchHeight);
+
+  // Append text
+  groupsEnter
+  .append('text')
+  .attr('class', 'legend-text')
+  .merge(groups.select('text'))
+    .text(d => d)
+    .attr('y', 20)
+    .attr('x', 40);
+
+  return svg.node();
 }

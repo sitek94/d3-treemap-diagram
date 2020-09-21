@@ -120,8 +120,7 @@ Promise.all([
     // Data attributes
     .attr('data-name', d => d.data.name)
     .attr('data-category', d => d.data.category)
-    .attr('data-value', d => d.data.value)
-    ;
+    .attr('data-value', d => d.data.value);
 
   // Clip path
   tile.append('clipPath')
@@ -139,11 +138,10 @@ Promise.all([
     .attr('y', (d, i) => 13 + i * 10)
     .text(d => d);
 
-  // Legend
-  select('#legend')
-    .call(colorLegend, {
-      colorScale: color,
-      swatchSize: 30,
+  // Color legend
+  colorLegend(select('#root'), {
+    colorScale: color,
+    swatchSize: 30,
   });
 
   console.log(selectedDataSet)
