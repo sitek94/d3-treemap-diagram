@@ -8,41 +8,59 @@ import * as d3 from 'd3';
 
 import { colorLegend } from './colorLegend';
 import { tooltip } from './tooltip';
+import { dropdown } from './dropdown';
 
-const datasets = {
-  kickstarter: {
+const datasets = [
+  {
+    name: 'kickstarter',
     title: 'Kickstarter Pledges',
     description: 'Top 100 highest funded projects on Kickstarter grouped by category',
     url: 'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/kickstarter-funding-data.json'
   },
-  videoGames: {
+  {
+    name: 'videoGames',
     title: 'Video Games Sales',
     description: 'Top 100 best-selling video games grouped by platform',
     url: 'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/video-game-sales-data.json'
   },
-  movies: {
+  {
+    name: 'movies',
     title: 'Movie Sales',
     description: 'Top 100 highest grossing movies grouped by genre',
     url: 'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/movie-data.json'
   },
-}
+]
+
+const rootElement = select('#root');
+const dropdownContainer = select('.dropdown-container');
+
+dropdown(dropdownContainer, {
+  options: datasets,
+  onOptionClick: option => {
+    console.log(option);
+  }
+})
 
 // Client dimensions
-const width = document.body.clientWidth > 800 ? document.body.clientWidth : 800;
-const height = document.body.clientHeight;
+const { clientWidth, clientHeight } = document.body;
+const width = clientWidth > 800 ? clientWidth - 20 : 800;
+const height = clientHeight;
+const xOffset = clientWidth > 800 ? 60 : 20;
 
 // Margin convention
 const margin = {
 	top: 100,
-  right: 20,
+  right: xOffset,
   bottom: 20,
-  left: 20,
+  left: xOffset,
 };
 const innerWidth = width - margin.left - margin.right;
 const innerHeight = height - margin.top - margin.bottom;
 
 // Select svg and set its dimensions
-const svg = select('svg')
+const svg = rootElement.append('svg')
+  .attr('id', 'treemap')
+  .attr('class', 'treemap')
   .attr('height', height)
   .attr('width', width);
 
@@ -67,7 +85,7 @@ const treemapLayout = data => treemap()
 // Color scale
 const color = d3.scaleOrdinal(d3.schemeCategory10)
 
-render(datasets.kickstarter);
+render(datasets[0]);
 
 function render(data) {
   const { title, description, url } = data;
@@ -103,7 +121,11 @@ function render(data) {
     const tile = g.selectAll('g')
       .data(root.leaves())
       .join('g')
-        .attr('transform', d => `translate(${d.x0},${d.y0})`);
+        .attr('class', 'tile-group')
+        .attr('transform', d => `translate(${d.x0},${d.y0})`)
+        // Event handlers
+        .on('mousemove', handleMouseover)
+        .on('mouseout', handleMouseout);
 
     // Rectangle
     tile.append('rect')
@@ -117,9 +139,7 @@ function render(data) {
       .attr('data-name', d => d.data.name)
       .attr('data-category', d => d.data.category)
       .attr('data-value', d => d.data.value)
-      // Event handlers
-      .on('mousemove', handleMouseover)
-      .on('mouseout', handleMouseout);
+      
 
     // Clip path
     tile.append('clipPath')
@@ -129,6 +149,7 @@ function render(data) {
 
     // Text
     tile.append('text')
+      .attr('class', 'tile-text')
       .attr('clip-path', d => 'url(#clip-' + d.data.id + ')')
     .selectAll('tspan')
       .data(d => d.data.name.split(/(?=[A-Z][^A-Z])/g))

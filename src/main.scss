@@ -43,25 +43,32 @@ svg {
 }
 
 /* FORM */
-.form {
+.dropdown-container {
   position: absolute;
   top: 0;
-  right: 0;
-  background-color: blue;
-  width: 400;
-  height: 200;
+  right: 64px;
+  
+  @media (max-width: 800px) {
+    right: 24px;
+  }
+
+  select {
+    color: var(--gray-30);
+    font-size: 1.6em;
+    border-color: var(--gray-30);
+  }
 }
 
 /* TILE */
 .tile {
-  text {
-    cursor: default;
-  }
-
-  &:hover {
+  &-group:hover rect {
     stroke: var(--black);
     stroke-opacity: .5;
     fill: var(--color-hover);
+  }
+
+  &-text {
+    cursor: default;
   }
 }
 
@@ -87,11 +94,13 @@ svg {
 /* TOOLTIP */
 .tooltip {
   position: absolute;
+  max-width: 250px;
 
   padding: 10px;
   border-radius: 6px;
   color: var(--white);
   background-color: rgba(0,0,0, .8);
+  font-size: .8em;
   text-align: center;
  
   pointer-events: none;
