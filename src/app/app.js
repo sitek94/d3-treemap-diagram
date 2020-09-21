@@ -13,15 +13,15 @@ const moviesUrl = 'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_
 const videoGamesUrl = 'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/video-game-sales-data.json';
 
 // Client dimensions
-const width = document.body.clientWidth;
+const width = document.body.clientWidth > 800 ? document.body.clientWidth : 800;
 const height = document.body.clientHeight;
 
 // Margin convention
 const margin = {
 	top: 20,
-  right: 100,
+  right: 20,
   bottom: 20,
-  left: 75,
+  left: 20,
 };
 const innerWidth = width - margin.left - margin.right;
 const innerHeight = height - margin.top - margin.bottom;
