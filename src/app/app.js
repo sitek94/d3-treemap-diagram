@@ -6,6 +6,8 @@ import {
 } from 'd3';
 import * as d3 from 'd3';
 
+import { colorLegend } from './colorLegend';
+
 const kickstarterUrl = 'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/kickstarter-funding-data.json';
 const moviesUrl = 'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/movie-data.json'
 const videoGamesUrl = 'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/video-game-sales-data.json';
@@ -41,8 +43,8 @@ const treemapLayout = data => treemap()
   (hierarchy(data)
     // Compute id for each data item
     .eachBefore(d => {
-      // Remove invalid characters
-      const name = d.data.name.replace(/,|\s|'/g,'');
+      // Remove invalid characters that break id or url (clip-path)
+      const name = d.data.name.replace(/[,'":()]|\s/g,'');
       d.data.id = (d.parent ? d.parent.data.id + '.' : '') + name;
     })
     .sum(d => d.value)
@@ -94,6 +96,16 @@ Promise.all([
     .attr('x', 4)
     .attr('y', (d, i) => 13 + i * 10)
     .text(d => d);
+
+  select('#legend')
+    .call(colorLegend, {
+      colorScale: color,
+      circleRadius: 30,
+      circleSpacing: 80,
+      textOffset: 50
+  });
+
+
   console.log(kickstarterData);
 
 
