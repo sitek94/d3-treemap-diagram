@@ -5,11 +5,11 @@ export const treemap = (selection, props) => {
   const {
     title,
     description,
+    colorScale,
     width,
     height,
     margin,
-    xOffset,
-    data
+    data,
   } = props;
   
   // Margin convention
@@ -34,14 +34,11 @@ export const treemap = (selection, props) => {
       .sum(d => d.value)
       .sort((a, b) => b.value - a.value))
 
-  // Color scale
-  const color = d3.scaleOrdinal(d3.schemeCategory10)
-
   // Title
   selection.append('text')
     .attr('id', 'title')
     .attr('class', 'title')
-    .attr('x', innerWidth / 2)
+    .attr('x', width / 2)
     .attr('y', 50)
     .attr('text-anchor', 'middle')
     .text(title);
@@ -50,12 +47,12 @@ export const treemap = (selection, props) => {
   selection.append('text')
     .attr('id', 'description')
     .attr('class', 'description')
-    .attr('x', innerWidth / 2)
+    .attr('x', width / 2)
     .attr('y', 80)
     .attr('text-anchor', 'middle')
     .text(description);
 
-  // Root node
+  // Root data node
   const root = treemapLayout(data);
 
   // Get tooltip event handlers
@@ -75,7 +72,7 @@ export const treemap = (selection, props) => {
   tile.append('rect')
     .attr('id', d => d.data.id)
     .attr('class', 'tile')
-    .attr('fill', d => { while (d.depth > 1) d = d.parent; return color(d.data.name); })
+    .attr('fill', d => { while (d.depth > 1) d = d.parent; return colorScale(d.data.name); })
     .attr('fill-opacity', 0.6)
     .attr('width', d => d.x1 - d.x0)
     .attr('height', d => d.y1 - d.y0)
@@ -101,7 +98,7 @@ export const treemap = (selection, props) => {
       .attr('y', (d, i) => 13 + i * 10)
       .text(d => d);
 
-    d3.select('#root').append('svg')
+    
   }
 
 

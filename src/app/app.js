@@ -30,7 +30,9 @@ const datasets = {
     description: 'Top 100 highest grossing movies grouped by genre',
     url: 'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/movie-data.json'
   },
-}
+};
+
+const colorScheme20 = ["#705aa2", "#6bb541", "#a95bce", "#cea834", "#5e6fda", "#d16a2c", "#5f97d3", "#d54142", "#3fbfbc", "#ca4eac", "#5cbc82", "#d84a82", "#437d43", "#c990d4", "#a6ae59", "#a1507b", "#786d26", "#e38383", "#c68b52", "#a14a40"];
 
 const rootElement = select('#root');
 const dropdownContainer = select('.dropdown-container');
@@ -44,14 +46,13 @@ const xOffset = clientWidth > 800 ? 60 : 20;
 let selectedData = datasets.kickstarter;
 let fetchedData;
 
+// Handle select option
 const handleSelectOption = option => {
   selectedData = datasets[option];
   render()
 }
 
-
-
-// Select svg and set its dimensions
+// Treemap svg
 const svg = rootElement.append('svg')
   .attr('id', 'treemap')
   .attr('class', 'treemap')
@@ -59,21 +60,27 @@ const svg = rootElement.append('svg')
   .attr('width', width);
 
 // Color scale
-const color = d3.scaleOrdinal(d3.schemeCategory10)
+
 
 function render() {
   
-  // Title 
+  // Dropdown 
   select('#dropdown-container')
     .call(dropdown, {
       options: Object.values(datasets),
       onOptionClick: handleSelectOption
     });
 
+  // Color scale
+  const colorScale = d3.scaleOrdinal()
+    .domain(fetchedData.children.map(d => d.name))
+    .range(colorScheme20);
   
+
   svg.call(treemap, {
     title: 'Test title',
     description: 'Test',
+    colorScale,
     width,
     height,
     margin: {
@@ -85,6 +92,11 @@ function render() {
     data: fetchedData
   })
 
+  // Color legend
+  colorLegend(select('#root'), {
+    colorScale,
+    swatchSize: 30,
+  });
  
 }
 
