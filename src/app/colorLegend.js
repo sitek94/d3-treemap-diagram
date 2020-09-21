@@ -48,12 +48,16 @@ export const colorLegend = (selection, props) => {
 
   // Append text
   groupsEnter
-  .append('text')
-  .attr('class', 'legend-text')
-  .merge(groups.select('text'))
-    .text(d => d)
-    .attr('y', 20)
-    .attr('x', 40);
+    .append('text')
+    .attr('class', 'legend-text')
+    .merge(groups.select('text'))
+      .text(d => d)
+      .attr('y', 20)
+      .attr('x', 40);
 
-  return svg.node();
+       // Color legend
+  colorLegend(select('#root'), {
+    colorScale: color,
+    swatchSize: 30,
+  });
 }
