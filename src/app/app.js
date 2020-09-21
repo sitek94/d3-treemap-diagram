@@ -97,12 +97,11 @@ Promise.all([
     .attr('y', (d, i) => 13 + i * 10)
     .text(d => d);
 
+  // Legend
   select('#legend')
     .call(colorLegend, {
       colorScale: color,
-      circleRadius: 30,
-      circleSpacing: 80,
-      textOffset: 50
+      swatchSize: 30,
   });
 
 
