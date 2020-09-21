@@ -81,19 +81,19 @@ Promise.all([
 
   // Clip path
   cell.append("clipPath")
-      .attr("id", function(d) { return "clip-" + d.data.id; })
+      .attr("id", d => "clip-" + d.data.id)
     .append("use")
-      .attr("xlink:href", function(d) { return "#" + d.data.id; });
+      .attr("xlink:href", d => "#" + d.data.id);
   
   // Text
   cell.append('text')
-    .attr("clip-path", function(d) { return "url(#clip-" + d.data.id + ")"; })
+    .attr("clip-path", d => "url(#clip-" + d.data.id + ")")
   .selectAll('tspan')
-    .data(function(d) { return d.data.name.split(/(?=[A-Z][^A-Z])/g); })
+    .data(d => d.data.name.split(/(?=[A-Z][^A-Z])/g))
   .enter().append('tspan')
     .attr('x', 4)
-    .attr('y', function(d, i) { return 13 + i * 10; })
-    .text(function(d) { return d; });
+    .attr('y', (d, i) => 13 + i * 10)
+    .text(d => d);
   console.log(kickstarterData);
 
 
