@@ -16,8 +16,12 @@ export const treemap = (selection, props) => {
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;  
 
-  // Append group element to svg to complete margin convention
-  const g = selection.append('g')
+  // General update pattern
+  const g = selection.selectAll('.treemap-container').data([null]);
+  const gEnter = g.enter().append('g')
+    .attr('class', 'treemap-container');
+  gEnter.merge(g)
+    // Margin convention
     .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
   // Function that takes data and returns root node
@@ -34,23 +38,28 @@ export const treemap = (selection, props) => {
       .sum(d => d.value)
       .sort((a, b) => b.value - a.value))
 
+  const headerG = selection.selectAll('.header').data([null]);
+  const headerGEnter = headerG.enter().append('g')
+      .attr('class', 'header');
+    headerGEnter.merge(headerG)
+      .attr('transform', `translate(${width / 2}, 100)`)
+      .attr('text-anchor', 'middle');
+
   // Title
-  selection.append('text')
-    .attr('id', 'title')
-    .attr('class', 'title')
-    .attr('x', width / 2)
-    .attr('y', 50)
-    .attr('text-anchor', 'middle')
-    .text(title);
+  const titleEl = headerGEnter.append('text')
+      .attr('id', 'title')
+      .attr('class', 'title')
+    .merge(headerG.select('#title')) 
+      .text(title)
+      //.attr('y', 50);
 
   // Description
-  selection.append('text')
-    .attr('id', 'description')
-    .attr('class', 'description')
-    .attr('x', width / 2)
-    .attr('y', 80)
-    .attr('text-anchor', 'middle')
-    .text(description);
+  const descriptionEl = headerGEnter.append('text')
+      .attr('id', 'description')
+      .attr('class', 'description')
+    .merge(headerG.select('#description'))
+      .text(description)
+      .attr('y', 50);
 
   // Root data node
   const root = treemapLayout(data);
@@ -58,7 +67,11 @@ export const treemap = (selection, props) => {
   // Get tooltip event handlers
   const { handleMouseover, handleMouseout } = tooltip();
 
-  // Tile group element
+  /* 
+      # TODO 
+      # GENERAL UPDATE PATTERN
+      # 
+  */
   const tile = g.selectAll('g')
     .data(root.leaves())
     .join('g')
@@ -81,24 +94,22 @@ export const treemap = (selection, props) => {
     .attr('data-category', d => d.data.category)
     .attr('data-value', d => d.data.value);      
 
-    // Clip path
-    tile.append('clipPath')
-        .attr('id', d => 'clip-' + d.data.id)
-      .append('use')
-        .attr('xlink:href', d => '#' + d.data.id);
+  // Clip path
+  tile.append('clipPath')
+      .attr('id', d => 'clip-' + d.data.id)
+    .append('use')
+      .attr('xlink:href', d => '#' + d.data.id);
 
-    // Text
-    tile.append('text')
-      .attr('class', 'tile-text')
-      .attr('clip-path', d => 'url(#clip-' + d.data.id + ')')
-    .selectAll('tspan')
-      .data(d => d.data.name.split(/(?=[A-Z][^A-Z])/g))
-    .enter().append('tspan')
-      .attr('x', 4)
-      .attr('y', (d, i) => 13 + i * 10)
-      .text(d => d);
-
-    
-  }
+  // Text
+  tile.append('text')
+    .attr('class', 'tile-text')
+    .attr('clip-path', d => 'url(#clip-' + d.data.id + ')')
+  .selectAll('tspan')
+    .data(d => d.data.name.split(/(?=[A-Z][^A-Z])/g))
+  .enter().append('tspan')
+    .attr('x', 4)
+    .attr('y', (d, i) => 13 + i * 10)
+    .text(d => d);
+}
 
 

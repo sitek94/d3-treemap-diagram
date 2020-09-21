@@ -24,8 +24,6 @@ export const colorLegend = (selection, props) => {
   const g = svg.append('g')
     .attr('transform', 'translate(50, 0)');
 
-  console.log(colorScale.domain());
-
   // Legend item groups
   const groups = g.selectAll('g')
     .data(colorScale.domain());
@@ -55,7 +53,5 @@ export const colorLegend = (selection, props) => {
     .merge(groups.select('text'))
       .text(d => d)
       .attr('y', 20)
-      .attr('x', 40);
-
-       
+      .attr('x', 40); 
 }

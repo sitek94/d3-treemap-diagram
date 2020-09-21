@@ -76,10 +76,9 @@ function render() {
     .domain(fetchedData.children.map(d => d.name))
     .range(colorScheme20);
   
-
   svg.call(treemap, {
-    title: 'Test title',
-    description: 'Test',
+    title: selectedData.title,
+    description: selectedData.description,
     colorScale,
     width,
     height,
@@ -100,6 +99,7 @@ function render() {
  
 }
 
+// Fetch data
 json(selectedData.url)
   .then(data => {
     fetchedData = data;
