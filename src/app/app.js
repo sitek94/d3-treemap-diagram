@@ -51,7 +51,7 @@ const title = svg.append('text')
   .attr('class', 'title')
   .attr('x', innerWidth / 2)
   .attr('y', 50)
-  .attr('text-anchor', 'middle')
+  .attr('text-anchor', 'middle');
 
 // Description
 const description = svg.append('text')
@@ -59,7 +59,7 @@ const description = svg.append('text')
   .attr('class', 'description')
   .attr('x', innerWidth / 2)
   .attr('y', 80)
-  .attr('text-anchor', 'middle')
+  .attr('text-anchor', 'middle');
 
 // Append group element to svg to complete margin convention
 const g = svg.append('g')
@@ -69,12 +69,11 @@ const g = svg.append('g')
 const treemapLayout = data => treemap()
     .size([innerWidth, innerHeight])
     .padding(1)
-    .round(true)
   (hierarchy(data)
     // Compute id for each data item
     .eachBefore(d => {
       // Remove invalid characters that break id or url (clip-path)
-      const name = d.data.name.replace(/[,'":()]|\s/g,'');
+      const name = d.data.name.replace(/[,'":()]|\s/g, '');
       d.data.id = (d.parent ? d.parent.data.id + '.' : '') + name;
     })
     .sum(d => d.value)
@@ -94,38 +93,45 @@ Promise.all([
   videoGamesData
 ]) => {
   
-  const selectedDataSet = kickstarterData;
+  // Selected data set
+  const selectedDataSet = videoGamesData;
 
   // Root node
   const root = treemapLayout(selectedDataSet);
   
+  // Update title and description
   title.text(datasets.kickstarter.title)
   description.text(datasets.kickstarter.description)
-  
 
-  // Cell group element
-  const cell = g.selectAll('g')
+  // Tile group element
+  const tile = g.selectAll('g')
     .data(root.leaves())
     .join('g')
       .attr('transform', d => `translate(${d.x0},${d.y0})`);
 
   // Rectangle
-  cell.append('rect')
-    .attr("id", function(d) { return d.data.id; })
+  tile.append('rect')
+    .attr('id', d => d.data.id)
+    .attr('class', 'tile')
     .attr('fill', d => { while (d.depth > 1) d = d.parent; return color(d.data.name); })
     .attr('fill-opacity', 0.6)
     .attr('width', d => d.x1 - d.x0)
-    .attr('height', d => d.y1 - d.y0);
+    .attr('height', d => d.y1 - d.y0)
+    // Data attributes
+    .attr('data-name', d => d.data.name)
+    .attr('data-category', d => d.data.category)
+    .attr('data-value', d => d.data.value)
+    ;
 
   // Clip path
-  cell.append("clipPath")
-      .attr("id", d => "clip-" + d.data.id)
-    .append("use")
-      .attr("xlink:href", d => "#" + d.data.id);
+  tile.append('clipPath')
+      .attr('id', d => 'clip-' + d.data.id)
+    .append('use')
+      .attr('xlink:href', d => '#' + d.data.id);
   
   // Text
-  cell.append('text')
-    .attr("clip-path", d => "url(#clip-" + d.data.id + ")")
+  tile.append('text')
+    .attr('clip-path', d => 'url(#clip-' + d.data.id + ')')
   .selectAll('tspan')
     .data(d => d.data.name.split(/(?=[A-Z][^A-Z])/g))
   .enter().append('tspan')
@@ -140,15 +146,5 @@ Promise.all([
       swatchSize: 30,
   });
 
-
-  console.log(kickstarterData);
-
-
-
-
-
-
-
-
-
+  console.log(selectedDataSet)
 })
