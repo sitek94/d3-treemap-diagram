@@ -8,9 +8,23 @@ import * as d3 from 'd3';
 
 import { colorLegend } from './colorLegend';
 
-const kickstarterUrl = 'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/kickstarter-funding-data.json';
-const moviesUrl = 'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/movie-data.json'
-const videoGamesUrl = 'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/video-game-sales-data.json';
+const datasets = {
+  kickstarter: {
+    title: 'Kickstarter Pledges',
+    description: 'Top 100 highest funded projects on Kickstarter grouped by category',
+    url: 'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/kickstarter-funding-data.json'
+  },
+  videoGames: {
+    title: 'Video Games Sales',
+    description: 'Top 100 best-selling video games grouped by platform',
+    url: 'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/video-game-sales-data.json'
+  },
+  movies: {
+    title: 'Movie Sales',
+    description: 'Top 100 highest grossing movies grouped by genre',
+    url: 'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/movie-data.json'
+  },
+}
 
 // Client dimensions
 const width = document.body.clientWidth > 800 ? document.body.clientWidth : 800;
@@ -18,7 +32,7 @@ const height = document.body.clientHeight;
 
 // Margin convention
 const margin = {
-	top: 20,
+	top: 100,
   right: 20,
   bottom: 20,
   left: 20,
@@ -30,6 +44,22 @@ const innerHeight = height - margin.top - margin.bottom;
 const svg = select('svg')
   .attr('height', height)
   .attr('width', width);
+
+// Title
+const title = svg.append('text')
+  .attr('id', 'title')
+  .attr('class', 'title')
+  .attr('x', innerWidth / 2)
+  .attr('y', 50)
+  .attr('text-anchor', 'middle')
+
+// Description
+const description = svg.append('text')
+  .attr('id', 'description')
+  .attr('class', 'description')
+  .attr('x', innerWidth / 2)
+  .attr('y', 80)
+  .attr('text-anchor', 'middle')
 
 // Append group element to svg to complete margin convention
 const g = svg.append('g')
@@ -55,17 +85,23 @@ const color = d3.scaleOrdinal(d3.schemeCategory10)
 
 // Fetch data
 Promise.all([
-  json(kickstarterUrl),
-  json(moviesUrl),
-  json(videoGamesUrl)
+  json(datasets.kickstarter.url),
+  json(datasets.movies.url),
+  json(datasets.videoGames.url)
 ]).then(([
   kickstarterData,
   moviesData,
   videoGamesData
 ]) => {
   
+  const selectedDataSet = kickstarterData;
+
   // Root node
-  const root = treemapLayout(kickstarterData);
+  const root = treemapLayout(selectedDataSet);
+  
+  title.text(datasets.kickstarter.title)
+  description.text(datasets.kickstarter.description)
+  
 
   // Cell group element
   const cell = g.selectAll('g')
