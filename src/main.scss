@@ -23,6 +23,7 @@ body {
   height: 100vh;
 }
 
+/* SVG */
 svg {
   display: block;
   
@@ -36,27 +37,32 @@ svg {
   }
 }
 
-/* CELL */
-.cell:hover {
-  stroke: var(--black);
-  stroke-opacity: .5;
-  fill: var(--color-hover);
+/* ROOT */
+.root {
+  position: relative;
 }
 
-/* TICK */
-.tick text {
-  font-size: 1.2em;
-  fill: var(--gray-40);
+/* FORM */
+.form {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: blue;
+  width: 400;
+  height: 200;
 }
 
-.tick line {
-  stroke: var(--gray-20);
-}
+/* TILE */
+.tile {
+  text {
+    cursor: default;
+  }
 
-/* AXIS */
-.axis-label {
-  font-size: 5em;
-  fill: var(--gray-30);
+  &:hover {
+    stroke: var(--black);
+    stroke-opacity: .5;
+    fill: var(--color-hover);
+  }
 }
 
 /* TITLE */
@@ -81,7 +87,7 @@ svg {
 /* TOOLTIP */
 .tooltip {
   position: absolute;
-  width: 150px;
+
   padding: 10px;
   border-radius: 6px;
   color: var(--white);

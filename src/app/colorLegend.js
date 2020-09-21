@@ -5,13 +5,13 @@ export const colorLegend = (selection, props) => {
     swatchWidth = swatchSize,
     swatchHeight = swatchSize,
     width = 600,
-    height = 500,
     columns = 3,
     ySpacing = 50,
   } = props;
 
   // Compute horizontal spacing
   const xSpacing = width / columns;
+  const height = (colorScale.domain().length / columns) * ySpacing;
 
   // Legend svg
   const svg = selection.append("svg")

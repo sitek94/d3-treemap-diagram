@@ -7,6 +7,7 @@ import {
 import * as d3 from 'd3';
 
 import { colorLegend } from './colorLegend';
+import { tooltip } from './tooltip';
 
 const datasets = {
   kickstarter: {
@@ -45,22 +46,6 @@ const svg = select('svg')
   .attr('height', height)
   .attr('width', width);
 
-// Title
-const title = svg.append('text')
-  .attr('id', 'title')
-  .attr('class', 'title')
-  .attr('x', innerWidth / 2)
-  .attr('y', 50)
-  .attr('text-anchor', 'middle');
-
-// Description
-const description = svg.append('text')
-  .attr('id', 'description')
-  .attr('class', 'description')
-  .attr('x', innerWidth / 2)
-  .attr('y', 80)
-  .attr('text-anchor', 'middle');
-
 // Append group element to svg to complete margin convention
 const g = svg.append('g')
   .attr('transform', `translate(${margin.left}, ${margin.top})`);
@@ -82,67 +67,81 @@ const treemapLayout = data => treemap()
 // Color scale
 const color = d3.scaleOrdinal(d3.schemeCategory10)
 
-// Fetch data
-Promise.all([
-  json(datasets.kickstarter.url),
-  json(datasets.movies.url),
-  json(datasets.videoGames.url)
-]).then(([
-  kickstarterData,
-  moviesData,
-  videoGamesData
-]) => {
+render(datasets.kickstarter);
+
+function render(data) {
+  const { title, description, url } = data;
   
-  // Selected data set
-  const selectedDataSet = videoGamesData;
+  // Title
+  svg.append('text')
+    .attr('id', 'title')
+    .attr('class', 'title')
+    .attr('x', innerWidth / 2)
+    .attr('y', 50)
+    .attr('text-anchor', 'middle')
+    .text(title);
 
-  // Root node
-  const root = treemapLayout(selectedDataSet);
-  
-  // Update title and description
-  title.text(datasets.kickstarter.title)
-  description.text(datasets.kickstarter.description)
+  // Description
+  svg.append('text')
+    .attr('id', 'description')
+    .attr('class', 'description')
+    .attr('x', innerWidth / 2)
+    .attr('y', 80)
+    .attr('text-anchor', 'middle')
+    .text(description);
 
-  // Tile group element
-  const tile = g.selectAll('g')
-    .data(root.leaves())
-    .join('g')
-      .attr('transform', d => `translate(${d.x0},${d.y0})`);
+  json(url)
+    .then(data => {
 
-  // Rectangle
-  tile.append('rect')
-    .attr('id', d => d.data.id)
-    .attr('class', 'tile')
-    .attr('fill', d => { while (d.depth > 1) d = d.parent; return color(d.data.name); })
-    .attr('fill-opacity', 0.6)
-    .attr('width', d => d.x1 - d.x0)
-    .attr('height', d => d.y1 - d.y0)
-    // Data attributes
-    .attr('data-name', d => d.data.name)
-    .attr('data-category', d => d.data.category)
-    .attr('data-value', d => d.data.value);
+    // Root node
+    const root = treemapLayout(data);
 
-  // Clip path
-  tile.append('clipPath')
-      .attr('id', d => 'clip-' + d.data.id)
-    .append('use')
-      .attr('xlink:href', d => '#' + d.data.id);
-  
-  // Text
-  tile.append('text')
-    .attr('clip-path', d => 'url(#clip-' + d.data.id + ')')
-  .selectAll('tspan')
-    .data(d => d.data.name.split(/(?=[A-Z][^A-Z])/g))
-  .enter().append('tspan')
-    .attr('x', 4)
-    .attr('y', (d, i) => 13 + i * 10)
-    .text(d => d);
+    // Get tooltip event handlers
+    const { handleMouseover, handleMouseout } = tooltip();
 
-  // Color legend
-  colorLegend(select('#root'), {
-    colorScale: color,
-    swatchSize: 30,
-  });
+    // Tile group element
+    const tile = g.selectAll('g')
+      .data(root.leaves())
+      .join('g')
+        .attr('transform', d => `translate(${d.x0},${d.y0})`);
 
-  console.log(selectedDataSet)
-})
+    // Rectangle
+    tile.append('rect')
+      .attr('id', d => d.data.id)
+      .attr('class', 'tile')
+      .attr('fill', d => { while (d.depth > 1) d = d.parent; return color(d.data.name); })
+      .attr('fill-opacity', 0.6)
+      .attr('width', d => d.x1 - d.x0)
+      .attr('height', d => d.y1 - d.y0)
+      // Data attributes
+      .attr('data-name', d => d.data.name)
+      .attr('data-category', d => d.data.category)
+      .attr('data-value', d => d.data.value)
+      // Event handlers
+      .on('mousemove', handleMouseover)
+      .on('mouseout', handleMouseout);
+
+    // Clip path
+    tile.append('clipPath')
+        .attr('id', d => 'clip-' + d.data.id)
+      .append('use')
+        .attr('xlink:href', d => '#' + d.data.id);
+
+    // Text
+    tile.append('text')
+      .attr('clip-path', d => 'url(#clip-' + d.data.id + ')')
+    .selectAll('tspan')
+      .data(d => d.data.name.split(/(?=[A-Z][^A-Z])/g))
+    .enter().append('tspan')
+      .attr('x', 4)
+      .attr('y', (d, i) => 13 + i * 10)
+      .text(d => d);
+
+    // Color legend
+    colorLegend(select('#root'), {
+      colorScale: color,
+      swatchSize: 30,
+    });
+  })
+
+}
