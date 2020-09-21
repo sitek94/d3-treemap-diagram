@@ -40,7 +40,11 @@ const treemapLayout = data => treemap()
     .round(true)
   (hierarchy(data)
     // Compute id for each data item
-    .eachBefore(d => d.data.id = (d.parent ? d.parent.data.id + '.' : '') + d.data.name)
+    .eachBefore(d => {
+      // Remove invalid characters
+      const name = d.data.name.replace(/,|\s|'/g,'');
+      d.data.id = (d.parent ? d.parent.data.id + '.' : '') + name;
+    })
     .sum(d => d.value)
     .sort((a, b) => b.value - a.value))
 
@@ -67,26 +71,29 @@ Promise.all([
     .join('g')
       .attr('transform', d => `translate(${d.x0},${d.y0})`);
 
-  // Append rectangle to cell
+  // Rectangle
   cell.append('rect')
+    .attr("id", function(d) { return d.data.id; })
     .attr('fill', d => { while (d.depth > 1) d = d.parent; return color(d.data.name); })
     .attr('fill-opacity', 0.6)
     .attr('width', d => d.x1 - d.x0)
     .attr('height', d => d.y1 - d.y0);
 
-  // Clip overlapping 
-  cell.append('clipPath')
-      .attr('id', d => 'clip-' + d.data.id)
-    .append('use')
-      .attr('xlink:href', d => '#' + d.data.id);
+  // Clip path
+  cell.append("clipPath")
+      .attr("id", function(d) { return "clip-" + d.data.id; })
+    .append("use")
+      .attr("xlink:href", function(d) { return "#" + d.data.id; });
   
-  cell.append("text")
-    .attr("clip-path", d => "url(#clip-" + d.data.id + ")")
-  .selectAll("tspan")
+  // Text
+  cell.append('text')
+    .attr("clip-path", function(d) { return "url(#clip-" + d.data.id + ")"; })
+  .selectAll('tspan')
     .data(function(d) { return d.data.name.split(/(?=[A-Z][^A-Z])/g); })
-  .enter().append("tspan")
-    .attr("x", 4)
-    .attr("y", function(d, i) { return 13 + i * 10; })
+  .enter().append('tspan')
+    .attr('x', 4)
+    .attr('y', function(d, i) { return 13 + i * 10; })
+    .text(function(d) { return d; });
   console.log(kickstarterData);
 
 
