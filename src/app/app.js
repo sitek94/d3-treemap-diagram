@@ -10,36 +10,31 @@ import { colorLegend } from './colorLegend';
 import { tooltip } from './tooltip';
 import { dropdown } from './dropdown';
 
-const datasets = [
-  {
+const datasets = {
+  kickstarter: {
     name: 'kickstarter',
     title: 'Kickstarter Pledges',
     description: 'Top 100 highest funded projects on Kickstarter grouped by category',
     url: 'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/kickstarter-funding-data.json'
   },
-  {
+  videoGames: {
     name: 'videoGames',
     title: 'Video Games Sales',
     description: 'Top 100 best-selling video games grouped by platform',
     url: 'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/video-game-sales-data.json'
   },
-  {
+  movies: {
     name: 'movies',
     title: 'Movie Sales',
     description: 'Top 100 highest grossing movies grouped by genre',
     url: 'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/movie-data.json'
   },
-]
+}
 
 const rootElement = select('#root');
 const dropdownContainer = select('.dropdown-container');
 
-dropdown(dropdownContainer, {
-  options: datasets,
-  onOptionClick: option => {
-    console.log(option);
-  }
-})
+
 
 // Client dimensions
 const { clientWidth, clientHeight } = document.body;
@@ -56,6 +51,20 @@ const margin = {
 };
 const innerWidth = width - margin.left - margin.right;
 const innerHeight = height - margin.top - margin.bottom;
+
+// STATE
+let selectedData = datasets.kickstarter;
+let fetchedData;
+
+const handleSelectOption = option => {
+  selectedData = datasets[option];
+  render()
+}
+
+dropdown(dropdownContainer, {
+  options: Object.values(datasets),
+  onOptionClick: handleSelectOption
+})
 
 // Select svg and set its dimensions
 const svg = rootElement.append('svg')
@@ -85,10 +94,8 @@ const treemapLayout = data => treemap()
 // Color scale
 const color = d3.scaleOrdinal(d3.schemeCategory10)
 
-render(datasets[0]);
-
-function render(data) {
-  const { title, description, url } = data;
+function render() {
+  const { title, description } = selectedData;
   
   // Title
   svg.append('text')
@@ -108,11 +115,8 @@ function render(data) {
     .attr('text-anchor', 'middle')
     .text(description);
 
-  json(url)
-    .then(data => {
-
     // Root node
-    const root = treemapLayout(data);
+    const root = treemapLayout(fetchedData);
 
     // Get tooltip event handlers
     const { handleMouseover, handleMouseout } = tooltip();
@@ -138,8 +142,7 @@ function render(data) {
       // Data attributes
       .attr('data-name', d => d.data.name)
       .attr('data-category', d => d.data.category)
-      .attr('data-value', d => d.data.value)
-      
+      .attr('data-value', d => d.data.value);      
 
     // Clip path
     tile.append('clipPath')
@@ -163,6 +166,11 @@ function render(data) {
       colorScale: color,
       swatchSize: 30,
     });
-  })
-
 }
+
+json(selectedData.url)
+  .then(data => {
+    fetchedData = data;
+
+    render();
+  })
