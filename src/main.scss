@@ -94,6 +94,7 @@ svg {
 /* TOOLTIP */
 .tooltip {
   position: absolute;
+  min-width: 150px;
   max-width: 250px;
 
   padding: 10px;
