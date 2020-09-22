@@ -76,13 +76,13 @@ export const treemap = (selection, props) => {
   tileEnter
     .merge(tile)
       .attr('class', 'tile-group')
+      // Event handlers
       .on('mousemove', handleMouseover)
       .on('mouseout', handleMouseout)
-    .transition()
-      .duration(1000)
-      .attr('transform', d => `translate(${d.x0},${d.y0})`)
-      // Event handlers
-      tile.exit().remove();
+    // Transition
+    .transition().duration(1000)
+      .attr('transform', d => `translate(${d.x0},${d.y0})`);
+  tile.exit().remove();
 
   // Rectangle
   const rect = tile.select('rect');
@@ -94,8 +94,8 @@ export const treemap = (selection, props) => {
       .attr('data-name', d => d.data.name)
       .attr('data-category', d => d.data.category)
       .attr('data-value', d => d.data.value)
-    .transition()
-      .duration(1000)
+    // Transition
+    .transition().duration(1000)
       .attr('fill', d => { while (d.depth > 1) d = d.parent; return colorScale(d.data.name); })
       .attr('fill-opacity', 0.6)
       .attr('width', d => d.x1 - d.x0)
