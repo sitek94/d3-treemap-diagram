@@ -44,12 +44,11 @@ const xOffset = clientWidth > 800 ? 60 : 20;
 
 // STATE
 let selectedData = datasets.kickstarter;
-let fetchedData;
 
 // Handle select option
 const handleSelectOption = option => {
   selectedData = datasets[option];
-  render()
+  render(selectedData);
 }
 
 // Treemap svg
@@ -62,47 +61,45 @@ const svg = rootElement.append('svg')
 // Color scale
 
 
-function render() {
+function render(selected) {
   
-  // Dropdown 
-  select('#dropdown-container')
-    .call(dropdown, {
-      options: Object.values(datasets),
-      onOptionClick: handleSelectOption
-    });
+  json(selected.url)
+    .then(data => {
+      
+      // Dropdown 
+      select('#dropdown-container')
+        .call(dropdown, {
+          options: Object.values(datasets),
+          onOptionClick: handleSelectOption
+        });
 
-  // Color scale
-  const colorScale = d3.scaleOrdinal()
-    .domain(fetchedData.children.map(d => d.name))
-    .range(colorScheme20);
-  
-  svg.call(treemap, {
-    title: selectedData.title,
-    description: selectedData.description,
-    colorScale,
-    width,
-    height,
-    margin: {
-      top: 100,
-      right: xOffset,
-      bottom: 20,
-      left: xOffset,
-    },
-    data: fetchedData
+      // Color scale
+      const colorScale = d3.scaleOrdinal()
+        .domain(data.children.map(d => d.name))
+        .range(colorScheme20);
+      
+      svg.call(treemap, {
+        title: selectedData.title,
+        description: selectedData.description,
+        colorScale,
+        width,
+        height,
+        margin: {
+          top: 120,
+          right: xOffset,
+          bottom: 20,
+          left: xOffset,
+        },
+        data
+      })
+
+      // Color legend
+      colorLegend(select('#root'), {
+        colorScale,
+        swatchSize: 30,
+      });
+
   })
-
-  // Color legend
-  colorLegend(select('#root'), {
-    colorScale,
-    swatchSize: 30,
-  });
- 
 }
 
-// Fetch data
-json(selectedData.url)
-  .then(data => {
-    fetchedData = data;
-
-    render();
-  })
+render(selectedData);

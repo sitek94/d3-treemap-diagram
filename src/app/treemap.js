@@ -16,15 +16,7 @@ export const treemap = (selection, props) => {
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;  
 
-  // General update pattern
-  const g = selection.selectAll('.treemap-container').data([null]);
-  const gEnter = g.enter().append('g')
-    .attr('class', 'treemap-container');
-  gEnter.merge(g)
-    // Margin convention
-    .attr('transform', `translate(${margin.left}, ${margin.top})`);
-
-  // Function that takes data and returns root node
+  // Treemap layout constructor
   const treemapLayout = data => d3.treemap()
       .size([innerWidth, innerHeight])
       .padding(1)
@@ -36,80 +28,94 @@ export const treemap = (selection, props) => {
         d.data.id = (d.parent ? d.parent.data.id + '.' : '') + name;
       })
       .sum(d => d.value)
-      .sort((a, b) => b.value - a.value))
-
-  const headerG = selection.selectAll('.header').data([null]);
-  const headerGEnter = headerG.enter().append('g')
-      .attr('class', 'header');
-    headerGEnter.merge(headerG)
-      .attr('transform', `translate(${width / 2}, 100)`)
-      .attr('text-anchor', 'middle');
-
-  // Title
-  const titleEl = headerGEnter.append('text')
-      .attr('id', 'title')
-      .attr('class', 'title')
-    .merge(headerG.select('#title')) 
-      .text(title)
-      //.attr('y', 50);
-
-  // Description
-  const descriptionEl = headerGEnter.append('text')
-      .attr('id', 'description')
-      .attr('class', 'description')
-    .merge(headerG.select('#description'))
-      .text(description)
-      .attr('y', 50);
+      .sort((a, b) => b.value - a.value));
 
   // Root data node
   const root = treemapLayout(data);
 
+  // General update pattern
+  let g = selection.selectAll('.treemap-container').data([null]);
+  g = g.enter().append('g')
+    .merge(g)
+      .attr('class', 'treemap-container')
+      // Margin convention
+      .attr('transform', `translate(${margin.left}, ${margin.top})`);
+  
+  // Header - container for title and description
+  const headerGroup = selection.selectAll('.header').data([null]);
+  const headerGroupEnter = headerGroup.enter().append('g')
+  headerGroupEnter.merge(headerGroup)
+    .attr('class', 'header')
+    .attr('transform', `translate(${width / 2}, 75)`)
+    .attr('text-anchor', 'middle');
+
+  // Title
+  headerGroupEnter.append('text')
+      .attr('id', 'title')
+      .attr('class', 'title')
+    .merge(headerGroup.select('#title')) 
+      .text(title)
+      //.attr('y', 50);
+
+  // Description
+  headerGroupEnter.append('text')
+      .attr('id', 'description')
+      .attr('class', 'description')
+    .merge(headerGroup.select('#description'))
+      .text(description)
+      .attr('y', 30);
+
   // Get tooltip event handlers
   const { handleMouseover, handleMouseout } = tooltip();
 
-  /* 
-      # TODO 
-      # GENERAL UPDATE PATTERN
-      # 
-  */
+  // Tile container
   const tile = g.selectAll('g')
-    .data(root.leaves())
-    .join('g')
-      .attr('class', 'tile-group')
-      .attr('transform', d => `translate(${d.x0},${d.y0})`)
-      // Event handlers
-      .on('mousemove', handleMouseover)
-      .on('mouseout', handleMouseout);
+    .data(root.leaves());
+  
+  const tileEnter = tile.enter().append('g');
+  tileEnter.merge(tile)
+    .attr('class', 'tile-group')
+    .attr('transform', d => `translate(${d.x0},${d.y0})`)
+    // Event handlers
+    .on('mousemove', handleMouseover)
+    .on('mouseout', handleMouseout);
+    tile.exit().remove();
 
   // Rectangle
-  tile.append('rect')
-    .attr('id', d => d.data.id)
-    .attr('class', 'tile')
-    .attr('fill', d => { while (d.depth > 1) d = d.parent; return colorScale(d.data.name); })
-    .attr('fill-opacity', 0.6)
-    .attr('width', d => d.x1 - d.x0)
-    .attr('height', d => d.y1 - d.y0)
-    // Data attributes
-    .attr('data-name', d => d.data.name)
-    .attr('data-category', d => d.data.category)
-    .attr('data-value', d => d.data.value);      
+  const rect = tile.select('rect');
+  tileEnter.append('rect')
+    .merge(rect)
+      .attr('id', d => d.data.id)
+      .attr('class', 'tile')
+      .attr('fill', d => { while (d.depth > 1) d = d.parent; return colorScale(d.data.name); })
+      .attr('fill-opacity', 0.6)
+      .attr('width', d => d.x1 - d.x0)
+      .attr('height', d => d.y1 - d.y0)
+      // Data attributes
+      .attr('data-name', d => d.data.name)
+      .attr('data-category', d => d.data.category)
+      .attr('data-value', d => d.data.value);      
 
   // Clip path
-  tile.append('clipPath')
-      .attr('id', d => 'clip-' + d.data.id)
-    .append('use')
-      .attr('xlink:href', d => '#' + d.data.id);
+  const clipPath = tile.select('clipPath');
+  tileEnter.append('clipPath')
+    .merge(clipPath)
+        .attr('id', d => 'clip-' + d.data.id)
+      .append('use')
+        .attr('xlink:href', d => '#' + d.data.id);
 
   // Text
-  tile.append('text')
-    .attr('class', 'tile-text')
-    .attr('clip-path', d => 'url(#clip-' + d.data.id + ')')
-  .selectAll('tspan')
-    .data(d => d.data.name.split(/(?=[A-Z][^A-Z])/g))
-  .enter().append('tspan')
-    .attr('x', 4)
-    .attr('y', (d, i) => 13 + i * 10)
-    .text(d => d);
+  const text = tile.select('text');
+  tileEnter.append('text')  
+    .merge(text)
+      .attr('class', 'tile-text')
+        .attr('clip-path', d => 'url(#clip-' + d.data.id + ')')
+      .selectAll('tspan')
+        .data(d => d.data.name.split(/(?=[A-Z][^A-Z])/g))
+      .enter().append('tspan')
+        .attr('x', 4)
+        .attr('y', (d, i) => 13 + i * 10)
+        .text(d => d);
 }
 
 
