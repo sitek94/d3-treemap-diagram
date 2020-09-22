@@ -52,9 +52,7 @@ const handleSelectOption = option => {
 }
 
 // Treemap svg
-const svg = rootElement.append('svg')
-  .attr('id', 'treemap')
-  .attr('class', 'treemap')
+const svg = rootElement.select('#treemap')
   .attr('height', height)
   .attr('width', width);
 
@@ -67,11 +65,10 @@ function render(selected) {
     .then(data => {
       
       // Dropdown 
-      select('#dropdown-container')
-        .call(dropdown, {
-          options: Object.values(datasets),
-          onOptionClick: handleSelectOption
-        });
+      dropdownContainer.call(dropdown, {
+        options: Object.values(datasets),
+        onOptionClick: handleSelectOption
+      });
 
       // Color scale
       const colorScale = d3.scaleOrdinal()
@@ -94,11 +91,10 @@ function render(selected) {
       })
 
       // Color legend
-      colorLegend(select('#root'), {
+      rootElement.call(colorLegend, {
         colorScale,
         swatchSize: 30,
-      });
-
+      })
   })
 }
 

@@ -36,7 +36,7 @@ export const treemap = (selection, props) => {
   // General update pattern
   let g = selection.selectAll('.treemap-container').data([null]);
   g = g.enter().append('g')
-    .merge(g)
+    .merge(g) 
       .attr('class', 'treemap-container')
       // Margin convention
       .attr('transform', `translate(${margin.left}, ${margin.top})`);

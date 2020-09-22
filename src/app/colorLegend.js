@@ -14,28 +14,28 @@ export const colorLegend = (selection, props) => {
   const xSpacing = width / columns;
 
   // Legend svg
-  const svg = selection.append("svg")
-    .attr('id', 'legend')
-    .attr('class', 'legend')
-    .attr("width", width)
-    .attr("height", height);
-  
-  // Legend group container
-  const g = svg.append('g')
-    .attr('transform', 'translate(50, 0)');
+ const svg = selection.select('#legend')
+  .attr('width', width)
+  .attr('height', height);
+      
+  // Group container
+  let g = svg.selectAll('.legend-group').data([null]);
+  g = g.enter().append('g')
+    .merge(g)
+      .attr('class', 'legend-group')
+      .attr('transform', 'translate(50, 0)');    
 
   // Legend item groups
   const groups = g.selectAll('g')
     .data(colorScale.domain());
-  const groupsEnter = groups.enter().append('g')
-    .append('g')
-        .attr('class', '');
+  // Remove old groups before appending new ones
+  groups.exit().remove();
+  const groupsEnter = groups.enter().append('g');
   groupsEnter
     .merge(groups)
     	.attr('transform', (d, i) => 
-            `translate(${i % columns * xSpacing}, ${Math.floor(i / columns) * ySpacing})`)
-  	groups.exit().remove();
-  
+            `translate(${i % columns * xSpacing}, ${Math.floor(i / columns) * ySpacing})`);
+  	
   // Append rects
   groupsEnter
     .append('rect')
