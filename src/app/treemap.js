@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import { hierarchy, treemap as d3_treemap } from 'd3';
 import { tooltip } from './tooltip';
 
 export const treemap = (selection, props) => {
@@ -17,10 +17,10 @@ export const treemap = (selection, props) => {
   const innerHeight = height - margin.top - margin.bottom;  
 
   // Treemap layout constructor
-  const treemapLayout = data => d3.treemap()
+  const treemapLayout = data => d3_treemap()
       .size([innerWidth, innerHeight])
       .padding(1)
-    (d3.hierarchy(data)
+    (hierarchy(data)
       // Compute id for each data item
       .eachBefore(d => {
         // Remove invalid characters that break id or url (clip-path)
