@@ -111,16 +111,17 @@ export const treemap = (selection, props) => {
 
   // Text
   const text = tile.select('text');
-  tileEnter.append('text')  
+  const textEnter = tileEnter.append('text')  
     .merge(text)
       .attr('class', 'tile-text')
-        .attr('clip-path', d => 'url(#clip-' + d.data.id + ')')
-      .selectAll('tspan')
-        .data(d => d.data.name.split(/(?=[A-Z][^A-Z])/g))
-      .enter().append('tspan')
-        .attr('x', 4)
-        .attr('y', (d, i) => 13 + i * 10)
-        .text(d => d);
+      .attr('clip-path', d => 'url(#clip-' + d.data.id + ')');
+  const tspan =  textEnter.selectAll('tspan')
+    .data(d => d.data.name.split(/(?=[A-Z][^A-Z])/g));
+  tspan.enter().append('tspan')
+    .merge(tspan)
+      .attr('x', 4)
+      .attr('y', (d, i) => 13 + i * 10)
+      .text(d => d);
 }
 
 
