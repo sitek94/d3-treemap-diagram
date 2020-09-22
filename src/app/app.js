@@ -1,16 +1,10 @@
-import {
-  select,
-  json,
-  hierarchy,
-  tree,
-} from 'd3';
-import * as d3 from 'd3';
+import { select, json, scaleOrdinal } from 'd3';
 
 import { colorLegend } from './colorLegend';
-import { tooltip } from './tooltip';
 import { dropdown } from './dropdown';
 import { treemap } from './treemap';
 
+// Data sets
 const datasets = {
   kickstarter: {
     name: 'kickstarter',
@@ -28,15 +22,18 @@ const datasets = {
     name: 'movies',
     title: 'Movie Sales',
     description: 'Top 100 highest grossing movies grouped by genre',
-    url: 'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/movie-data.json'
+    url: 'ahttps://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/movie-data.json'
   },
 };
 
+// Custom color scheme
 const colorScheme20 = ["#705aa2", "#6bb541", "#a95bce", "#cea834", "#5e6fda", "#d16a2c", "#5f97d3", "#d54142", "#3fbfbc", "#ca4eac", "#5cbc82", "#d84a82", "#437d43", "#c990d4", "#a6ae59", "#a1507b", "#786d26", "#e38383", "#c68b52", "#a14a40"];
 
+// Selectors
 const rootElement = select('#root');
 const dropdownContainer = select('.dropdown-container');
 
+// Dimensions
 const { clientWidth, clientHeight } = document.body;
 const width = clientWidth > 800 ? clientWidth - 20 : 800;
 const height = clientHeight;
@@ -56,11 +53,10 @@ const svg = rootElement.select('#treemap')
   .attr('height', height)
   .attr('width', width);
 
-// Color scale
-
-
+// Render function
 function render(selected) {
   
+  // Fetch data
   json(selected.url)
     .then(data => {
       
@@ -71,10 +67,11 @@ function render(selected) {
       });
 
       // Color scale
-      const colorScale = d3.scaleOrdinal()
+      const colorScale = scaleOrdinal()
         .domain(data.children.map(d => d.name))
         .range(colorScheme20);
       
+      // Treemap
       svg.call(treemap, {
         title: selectedData.title,
         description: selectedData.description,
@@ -96,6 +93,17 @@ function render(selected) {
         swatchSize: 30,
       })
   })
+  // Catch error
+  .catch(error => {
+    select('body')
+      .append('div')
+      .attr('class', 'error-wrapper')
+        .append('div')
+          .attr('class', 'error-box')
+          .html('<h2>Oppps...</h2>Sorry something went wrong, while fetching the data. Try refreshing the browser.');
+    console.log(error);
+  })
 }
 
+// Initial render
 render(selectedData);
