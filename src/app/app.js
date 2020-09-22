@@ -22,7 +22,7 @@ const datasets = {
     name: 'movies',
     title: 'Movie Sales',
     description: 'Top 100 highest grossing movies grouped by genre',
-    url: 'ahttps://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/movie-data.json'
+    url: 'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/movie-data.json'
   },
 };
 
