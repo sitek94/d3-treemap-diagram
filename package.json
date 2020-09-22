@@ -1,7 +1,7 @@
 {
   "name": "d3-treemap-diagram",
   "version": "1.0.0",
-  "description": "Treemap diagram that shows the data about video game sales",
+  "description": "Treemap diagram that shows the data about Kickstarter, Movies and Video Games",
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server --config webpack.dev.js --open",
