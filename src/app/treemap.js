@@ -73,13 +73,16 @@ export const treemap = (selection, props) => {
     .data(root.leaves());
   
   const tileEnter = tile.enter().append('g');
-  tileEnter.merge(tile)
-    .attr('class', 'tile-group')
-    .attr('transform', d => `translate(${d.x0},${d.y0})`)
-    // Event handlers
-    .on('mousemove', handleMouseover)
-    .on('mouseout', handleMouseout);
-    tile.exit().remove();
+  tileEnter
+    .merge(tile)
+      .attr('class', 'tile-group')
+      .on('mousemove', handleMouseover)
+      .on('mouseout', handleMouseout)
+    .transition()
+      .duration(1000)
+      .attr('transform', d => `translate(${d.x0},${d.y0})`)
+      // Event handlers
+      tile.exit().remove();
 
   // Rectangle
   const rect = tile.select('rect');
@@ -87,14 +90,16 @@ export const treemap = (selection, props) => {
     .merge(rect)
       .attr('id', d => d.data.id)
       .attr('class', 'tile')
-      .attr('fill', d => { while (d.depth > 1) d = d.parent; return colorScale(d.data.name); })
-      .attr('fill-opacity', 0.6)
-      .attr('width', d => d.x1 - d.x0)
-      .attr('height', d => d.y1 - d.y0)
       // Data attributes
       .attr('data-name', d => d.data.name)
       .attr('data-category', d => d.data.category)
-      .attr('data-value', d => d.data.value);      
+      .attr('data-value', d => d.data.value)
+    .transition()
+      .duration(1000)
+      .attr('fill', d => { while (d.depth > 1) d = d.parent; return colorScale(d.data.name); })
+      .attr('fill-opacity', 0.6)
+      .attr('width', d => d.x1 - d.x0)
+      .attr('height', d => d.y1 - d.y0);      
 
   // Clip path
   const clipPath = tile.select('clipPath');
