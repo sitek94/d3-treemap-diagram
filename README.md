@@ -1,6 +1,6 @@
 # Kickstarter, Movies and Video Games - Treemap Diagram 
 
-See the project live here: https://sitek94.github.io/d3-treemap-diagram/.
+See the project live here: https://sitek94.github.io/d3-treemap-diagram
 
 This Treemap Diagram shows the data about:
 * Kickstarter Pledges
