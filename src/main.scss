@@ -46,10 +46,10 @@ svg {
 .dropdown-container {
   position: absolute;
   top: 0;
-  right: 64px;
+  left: 64px;
   
   @media (max-width: 800px) {
-    right: 24px;
+    left: 24px;
   }
 
   select {

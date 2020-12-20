@@ -2,14 +2,21 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Treemap Diagram</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="manifest" href="site.webmanifest">
+    <title>D3 Treemap Diagram</title>
   </head>
   <body>
     <div id="root" class="root">
       <div id="dropdown-container" class="dropdown-container"></div>
       <svg id="treemap" class="treemap"></svg>
       <svg id="legend" class="legend"></svg>
+      <div id="tooltip" class="tooltip">
+        <p id="tooltip-details"></p>
+      </div>
     </div>
-    <script src="https://cdn.freecodecamp.org/testable-projects-fcc/v1/bundle.js"></script>
   </body>
 </html>

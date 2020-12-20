@@ -3,17 +3,8 @@ import {
 } from 'd3';
 
 export const tooltip = () => {
-
-  // Tooltip container
-  const tooltip = select('body').append('div')
-  .attr('id', 'tooltip')
-  .attr('class', 'tooltip')
-  .style('opacity', 0);
-
-  // Tooltip details
-  const tooltipDetails = tooltip
-  .append('p')
-  .attr('class', 'tooltip-details');
+  const tooltip = select('#tooltip')
+  const tooltipDetails = select('#tooltip-details')
 
   // Mouse over handler
   const handleMouseover = (event, d) => {
